@@ -4,12 +4,25 @@ var express     = require('express');
 var bodyParser  = require('body-parser');
 var expect      = require('chai').expect;
 var cors        = require('cors');
+var helmet      = require('helmet');
 
 var apiRoutes         = require('./routes/api.js');
 var fccTestingRoutes  = require('./routes/fcctesting.js');
 var runner            = require('./test-runner');
 
+var MongoClient = require('mongodb');
+const CONNECTION_STRING = process.env.DB; 
+
 var app = express();
+
+app.use(helmet());
+
+app.use(helmet.contentSecurityPolicy({
+  directives: {
+    defaultSrc: ["'self'"],
+    styleSrc: ["'self'"]
+  }
+}))
 
 app.use('/public', express.static(process.cwd() + '/public'));
 
@@ -17,6 +30,8 @@ app.use(cors({origin: '*'})); //For FCC testing purposes only
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.set('trust proxy', true);
+
 
 //Index page (static HTML)
 app.route('/')
@@ -26,6 +41,16 @@ app.route('/')
 
 //For FCC testing purposes
 fccTestingRoutes(app);
+MongoClient.connect(CONNECTION_STRING, function(err, db) {
+  if(err){
+    console.log('database error', err);
+  } else {
+    console.log('database connected');
+    //Routing for API 
+    apiRoutes(app, db); 
+    
+  }
+});
 
 //Routing for API 
 apiRoutes(app);  

@@ -7,6 +7,7 @@
 */
 
 var chai = require('chai');
+var assert = chai.assert;
 var StockHandler = require('../controllers/stockHandler.js');
 
 var stockPrices = new StockHandler();
@@ -14,5 +15,11 @@ var stockPrices = new StockHandler();
 suite('Unit Tests', function(){
 
 //none requiered
-
+//   suite('Function stockHandler.fetchStock', function(){
+//     test('return fetch response from api', function(done){
+//       done();
+//     })
+  
+//   });  
+  
 });
